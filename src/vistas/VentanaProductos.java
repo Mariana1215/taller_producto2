@@ -5,32 +5,32 @@
 package vistas;
 
 import controladores.ControladorProducto;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import modelos.ConexionBD;
+import modelos.Categoria;
 import modelos.Producto;
-import org.mariadb.jdbc.Connection;
 
 /**
  *
  * @author Manuela Gomez
  */
-public class VentanaBusqueda extends javax.swing.JFrame {
+public class VentanaProductos extends javax.swing.JFrame {
 
     ControladorProducto controlador;
 
     /**
      * Creates new form VentanaBusqueda
      */
-    public VentanaBusqueda() {
+    public VentanaProductos() {
         initComponents();
         setLocationRelativeTo(this);
         controlador = new ControladorProducto();
         llenarTablaProducto();
+        setCbxCategoria();
+        setCbxFiltro();
     }
 
     /**
@@ -59,7 +59,9 @@ public class VentanaBusqueda extends javax.swing.JFrame {
         txtPrecio = new javax.swing.JTextField();
         txtNombre = new javax.swing.JTextField();
         txtDistribuidor = new javax.swing.JTextField();
-        txtCategoria = new javax.swing.JTextField();
+        cbxCategoria = new javax.swing.JComboBox<>();
+        lblCategoriaBusqueda = new javax.swing.JLabel();
+        cbxFiltro = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -151,6 +153,19 @@ public class VentanaBusqueda extends javax.swing.JFrame {
             }
         });
 
+        cbxCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        lblCategoriaBusqueda.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblCategoriaBusqueda.setForeground(new java.awt.Color(0, 0, 0));
+        lblCategoriaBusqueda.setText("Categoria");
+
+        cbxFiltro.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbxFiltro.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbxFiltroItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -164,57 +179,67 @@ public class VentanaBusqueda extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(lblCodigo)
-                        .addGap(38, 38, 38)
-                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(76, 76, 76)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                                .addComponent(txtDistribuidor, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(133, 133, 133)
                         .addComponent(btnActualizar)
                         .addGap(67, 67, 67)
                         .addComponent(btnEliminar)
                         .addGap(99, 99, 99)
-                        .addComponent(btnRegistrar)))
+                        .addComponent(btnRegistrar))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(45, 45, 45)
+                                .addComponent(lblCategoriaBusqueda)
+                                .addGap(27, 27, 27)
+                                .addComponent(cbxFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(76, 76, 76)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
+                                .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(lblCodigo))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                                    .addComponent(txtCodigo)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtDistribuidor, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                                    .addComponent(cbxCategoria, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
                 .addGap(39, 39, 39))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCodigo))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblCategoriaBusqueda)
+                            .addComponent(cbxFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(33, 33, 33)
+                        .addGap(41, 41, 41)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCodigo))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel1)
                             .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(28, 28, 28)
+                        .addGap(26, 26, 26)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -225,7 +250,7 @@ public class VentanaBusqueda extends javax.swing.JFrame {
                         .addGap(37, 37, 37)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
-                            .addComponent(txtCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(cbxCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(62, 62, 62)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRegresar)
@@ -256,19 +281,33 @@ public class VentanaBusqueda extends javax.swing.JFrame {
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
         // TODO add your handling code here:
+        if (camposVacios()) {
+            JOptionPane.showMessageDialog(null, "Ingrese todos los datos");
+            return;
+        }
         String codigo = txtCodigo.getText().trim();
         String nombre = txtNombre.getText().trim();
         double precio = Double.parseDouble(txtPrecio.getText());
         String distribuidor = txtDistribuidor.getText().trim();
-        String categoria = txtCategoria.getText().trim();
+        String nombreCategoria = cbxCategoria.getSelectedItem().toString().trim();
 
-        try{
-            Producto producto = new Producto(codigo, nombre, precio, distribuidor, categoria);
-            controlador.guardarProductos(producto);
+        Categoria categoriaSeleccionada = null;
+
+        for (Categoria categoria : controlador.getTodasLasCategorias()) {
+            if (categoria.getNombreCategoria().equals(nombreCategoria)) {
+                categoriaSeleccionada = categoria;
+                break;
+            }
+
+        }
+
+        try {
+            Producto producto = new Producto(codigo, nombre, precio, distribuidor, categoriaSeleccionada);
+            controlador.agregarProducto(producto);
             llenarTablaProducto();
             JOptionPane.showMessageDialog(null, "Producto registrado");
 
-        }catch (SQLException ex){
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "No se pudo guardar el producto");
             System.err.println(ex);
 
@@ -279,7 +318,7 @@ public class VentanaBusqueda extends javax.swing.JFrame {
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
         String codigo = txtCodigo.getText().trim();
-        controlador.deleteProducto(codigo);
+        controlador.eliminarProducto(codigo);
         llenarTablaProducto();
         JOptionPane.showMessageDialog(null, "Producto eliminado");
         limpiar();
@@ -289,12 +328,21 @@ public class VentanaBusqueda extends javax.swing.JFrame {
         // TODO add your handling code here:
         String codigo = txtCodigo.getText().trim();
         String nombre = txtPrecio.getText().trim();
-        double precio = Double.parseDouble(txtPrecio.getText());
         String distribuidor = txtDistribuidor.getText().trim();
-        String categoria = txtCategoria.getText().trim();
+        String nombreCategoria = cbxCategoria.getSelectedItem().toString();
+        double precio = Double.parseDouble(txtPrecio.getText());
 
-        Producto producto = new Producto(codigo, nombre, precio, distribuidor, categoria);
-        controlador.updateProductos(producto);
+        Categoria categoriaSeleccionada = null;
+
+        for (Categoria categoria : controlador.getTodasLasCategorias()) {
+            if (categoria.getNombreCategoria().equals(nombreCategoria)) {
+                categoriaSeleccionada = categoria;
+                break;
+            }
+        }
+
+        Producto producto = new Producto(codigo, nombre, precio, distribuidor, categoriaSeleccionada);
+        controlador.editarProducto(producto);
         llenarTablaProducto();
         JOptionPane.showMessageDialog(null, "Producto editado exitosamente");
         limpiar();
@@ -304,43 +352,29 @@ public class VentanaBusqueda extends javax.swing.JFrame {
         // TODO add your handling code here:
         String codigo = txtCodigo.getText().trim();
 
-        try {
-            DefaultTableModel modelo = new DefaultTableModel();
-            modelo.setColumnIdentifiers(new Object[]{
-                "Codigo", "Nombre", "Precio", "Distribuidor", "Categoria"
+        if (codigo.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Ingrese el código del producto que desea buscar");
+            return;
+        }
+
+        DefaultTableModel modelo = new DefaultTableModel();
+        modelo.setColumnIdentifiers(new Object[]{
+            "Codigo", "Nombre", "Precio", "Distribuidor", "Categoria"
+        });
+
+        tablaProducto.setModel(modelo);
+        Producto producto = controlador.buscarProducto(codigo);
+        if (producto != null) {
+            modelo.addRow(new Object[]{
+                producto.getCodigo(),
+                producto.getNombre(),
+                producto.getDistribuidor(),
+                producto.getPrecio(),
+                producto.getCategoria()
             });
-            tablaProducto.setModel(modelo);
-            ResultSet rs = controlador.buscarProducto(codigo);
-            ResultSetMetaData rsMD = rs.getMetaData();
-            int cantColum = rsMD.getColumnCount();
-            int anchos[] = {100, 100, 100, 100, 100};
-
-            for (int i = 0; i < tablaProducto.getColumnCount(); i++) {
-                tablaProducto.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
-
-            }
-            while (rs.next()) {
-                Object[] filas = new Object[cantColum];
-                for (int i = 0; i < cantColum; i++) {
-                    filas[i] = rs.getObject(i + 1);
-                }
-                modelo.addRow(filas);
-                txtNombre.setText(rs.getString("nombre"));
-                txtPrecio.setText(String.valueOf(rs.getDouble("precio")));
-                txtDistribuidor.setText(rs.getString("distribuidor"));
-                txtCategoria.setText(rs.getString("categoria"));
-
-            }
-            if (codigo.isEmpty()) {
-                txtPrecio.setText("");
-                txtPrecio.setText("");
-                txtDistribuidor.setText("");
-                txtCategoria.setText("");
-
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
+        } else {
+            JOptionPane.showMessageDialog(null, "producto no encontrado");
+            llenarTablaProducto();
         }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
@@ -349,32 +383,79 @@ public class VentanaBusqueda extends javax.swing.JFrame {
         new VentanaPrincipal().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnRegresarActionPerformed
-    private void llenarTablaProducto() {
-        try {
+
+    private void cbxFiltroItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxFiltroItemStateChanged
+        // TODO add your handling code here:
+        if (cbxFiltro.getSelectedIndex() != 0) {
+            int idCategoria = cbxFiltro.getSelectedIndex();
+
             DefaultTableModel modelo = new DefaultTableModel();
+
             modelo.setColumnIdentifiers(new Object[]{
-                "Codigo", "Nombre", "Precio", "Distribuidor", "Categoria"
+                "Código", "Nombre", "Distribuidor", "Precio", "Categoría"
             });
             tablaProducto.setModel(modelo);
-            ResultSet rs = controlador.listarProductos();
-            ResultSetMetaData rsMD = rs.getMetaData();
-            int cantColum = rsMD.getColumnCount();
-            int anchos[] = {100, 100, 100, 100, 100};
+            ArrayList<Producto> productos = controlador.buscarProductoPorCategoria(idCategoria);
 
-            for (int i = 0; i < tablaProducto.getColumnCount(); i++) {
-                tablaProducto.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
-
-            }
-            while (rs.next()) {
-                Object[] filas = new Object[cantColum];
-                for (int i = 0; i < cantColum; i++) {
-                    filas[i] = rs.getObject(i + 1);
+            if (!productos.isEmpty()) {
+                for (Producto producto : productos) {
+                    modelo.addRow(new Object[]{
+                        producto.getCodigo(),
+                        producto.getNombre(),
+                        producto.getDistribuidor(),
+                        producto.getPrecio(),
+                        producto.getCategoria().getNombreCategoria()
+                    });
                 }
-                modelo.addRow(filas);
+            } else {
+                llenarTablaProducto();
             }
+        } else {
+            llenarTablaProducto();
+        }
+    }//GEN-LAST:event_cbxFiltroItemStateChanged
+    private void setCbxCategoria() {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        cbxCategoria.setModel(modelo);
 
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
+        ArrayList<Categoria> categorias = controlador.getTodasLasCategorias();
+
+        modelo.addElement("Seleccione una categoria");
+
+        for (Categoria categoria : categorias) {
+            modelo.addElement(categoria.getNombreCategoria());
+        }
+    }
+
+    private void setCbxFiltro() {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        cbxFiltro.setModel(modelo);
+
+        ArrayList<Categoria> categorias = controlador.getTodasLasCategorias();
+
+        modelo.addElement("Seleccione una categoria");
+
+        for (Categoria categoria : categorias) {
+            modelo.addElement(categoria.getNombreCategoria());
+        }
+    }
+
+    private void llenarTablaProducto() {
+        DefaultTableModel modelo = new DefaultTableModel();
+        ArrayList<Producto> productos = controlador.listarProductos();
+        modelo.setColumnIdentifiers(new Object[]{
+            "Codigo", "Nombre", "Precio", "Distribuidor", "Categoria"
+        });
+        tablaProducto.setModel(modelo);
+
+        for (Producto producto : productos) {
+            modelo.addRow(new Object[]{
+                producto.getCodigo(),
+                producto.getNombre(),
+                producto.getPrecio(),
+                producto.getDistribuidor(),
+                producto.getCategoria().getNombreCategoria()
+            });
         }
     }
 
@@ -383,9 +464,15 @@ public class VentanaBusqueda extends javax.swing.JFrame {
         txtNombre.setText("");
         txtPrecio.setText("");
         txtDistribuidor.setText("");
-        txtCategoria.setText("");
+        cbxCategoria.setSelectedItem("");
 
     }
+
+    private boolean camposVacios() {
+        return (txtCodigo.getText().isEmpty() || txtNombre.getText().isEmpty() || txtDistribuidor.getText().isEmpty()
+                || cbxCategoria.getSelectedIndex() == 0 || txtPrecio.getText().isEmpty());
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
@@ -393,15 +480,17 @@ public class VentanaBusqueda extends javax.swing.JFrame {
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnRegistrar;
     private javax.swing.JButton btnRegresar;
+    private javax.swing.JComboBox<String> cbxCategoria;
+    private javax.swing.JComboBox<String> cbxFiltro;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblCategoriaBusqueda;
     private javax.swing.JLabel lblCodigo;
     private javax.swing.JTable tablaProducto;
-    private javax.swing.JTextField txtCategoria;
     private javax.swing.JTextField txtCodigo;
     private javax.swing.JTextField txtDistribuidor;
     private javax.swing.JTextField txtNombre;

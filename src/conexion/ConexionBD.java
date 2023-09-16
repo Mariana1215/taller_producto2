@@ -2,13 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package modelos;
+package conexion;
 
+import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import org.mariadb.jdbc.Connection;
+
 
 /**
  *
@@ -16,7 +17,7 @@ import org.mariadb.jdbc.Connection;
  */
 public class ConexionBD {
     
-     private final String base = "tallerProductos";
+     private final String base = "taller_productos";
      private final String user = "root";
      private final String password = "";
      private final String url = "jdbc:mariadb://localhost:3306/" + base;
