@@ -35,7 +35,7 @@ public class ControladorProducto {
             ResultSet rs;
 
             String query = "SELECT productos.codigo, productos.nombre, productos.distribuidor, productos.precio, productos.id_categoria, "
-                    + "categorias.nombre_categoria FROM productos JOIN categorias ON productos.id_categoria = categorias.id";
+                    + "categorias.nombre_categoria FROM productos JOIN generos ON productos.id_categoria = categorias.id";
 
             ps = con.prepareStatement(query);
             rs = ps.executeQuery();
